@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE struts PUBLIC
+	"-//Apache Software Foundation//DTD Struts Configuration 2.3//EN"
+	"http://struts.apache.org/dtds/struts-2.3.dtd">
+<struts>
+	<constant name="struts.allowed.action.names" value="[a-z{}]*"/>
+	<constant name="struts.strictMethodInvocation.methodRegex" value="([a-zA-Z]*)"/>
+	
+	<constant name="struts.devMode" value="true" />
+    <constant name="struts.convention.action.suffix" value="Controller"/>
+    <constant name="struts.convention.action.mapAllMatches" value="true"/>
+    <constant name="struts.convention.default.parent.package" value="rest-default"/>
+    <constant name="struts.convention.package.locators" value="controllers"/>
+ 
+	<constant name="struts.rest.content.restrictToGET" value="false"/>
+ 
+	<constant name="struts.i18n.encoding" value="UTF-8"/>
+    
+    <bean name="strutsjsonhandler" type="org.apache.struts2.rest.handler.ContentTypeHandler" class="com.jrorg.bookmyshow.filters.StrutsJSONHandler"/>
+    <constant name="struts.rest.handlerOverride.json" value="strutsjsonhandler"/>
+    <constant name="struts.rest.handlerOverride.xml" value="strutsjsonhandler"/>
+    <constant name="struts.rest.handlerOverride.xhtml" value="strutsjsonhandler"/>
+    
+    
+</struts> 
