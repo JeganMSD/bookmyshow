@@ -16,6 +16,7 @@ import com.jrorg.bookmyshow.dbutils.PersistenceManager;
 import com.jrorg.bookmyshow.dbutils.PersistenceManager.Transaction;
 import com.jrorg.bookmyshow.entity.Booking;
 import com.jrorg.bookmyshow.entity.Show;
+import com.jrorg.bookmyshow.entity.Ticket;
 import com.jrorg.bookmyshow.entity.User;
 import com.jrorg.bookmyshow.request.BaseRequest;
 import com.jrorg.bookmyshow.request.TicketBookingRequest;
@@ -138,6 +139,12 @@ public class UsersManager<K extends User,V extends UserRequest>  implements Base
 					booking.setStatus(0);
 					entitymanager.persist(booking);
 					Long booking_id=booking.getId();
+					List<Ticket> tickets = entitymanager.createQuery("SELECT t FROM BMS_Tickets t WHERE t.id IN (:values) AND booking_id IN (SELECT b from BMS_Bookings b where b.status='0' and show_id='"+request.getShow_id()+"')",Ticket.class)
+					 .setParameter("values", request.getTicket_ids()).getResultList();
+					if(tickets!=null && tickets.size()<request.getTicket_ids().size()) {
+						entitymanager.createQuery("update BMS_Bookings set status = 2 where id = :booking_id").
+						setParameter("booking_id", tickets.get(0).getBooking().getId()).executeUpdate();
+					}
 					entitymanager.createQuery("update BMS_Tickets  set booking_id = :booking_id where id IN (:values)")
 			            .setParameter("booking_id", booking_id)
 			            .setParameter("values", request.getTicket_ids())
