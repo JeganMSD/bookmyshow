@@ -16,11 +16,6 @@ public class BookingsController<K extends Booking,V extends BookingRequest> exte
 	public HttpHeaders index() {
 		return super.index();
 	}
-	@Mandatoryparams(params="booked_time,status,no_of_seats,show_id,user_id")
-	@Allowedparams(params="booked_time,status,no_of_seats,show_id,user_id")
-	public HttpHeaders create() {
-		return super.create();
-	}
 
 	@Allowedparams(params="booked_time,status,no_of_seats,show_id,user_id")
 	public HttpHeaders update() {
