@@ -129,6 +129,7 @@ public class UsersManager<K extends User,V extends UserRequest>  implements Base
 			@Override
 			public Booking perform(EntityManager entitymanager) {
 				try {
+					request.setTicket_ids(request.getTicket_ids().subList(0, MAX_ALLOWED_BOOKINGS));
 					Booking booking = new Booking();
 					booking.setNo_of_seats(request.getTicket_ids().size());
 					Show show = new Show();
