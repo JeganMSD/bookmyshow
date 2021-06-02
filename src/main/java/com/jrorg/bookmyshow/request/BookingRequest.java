@@ -20,13 +20,21 @@ public class BookingRequest extends BaseRequest {
 		BookingStates(int key){
 			this.key = key;
 		}
+		public static BookingStates parse(int key) {
+			for(BookingStates state:BookingStates.values()) {
+				if(state.key  == key) {
+					return state;
+				}
+			}
+			return null;
+		}
 	}
 	
 	private Long booked_time;
 	
 	private BookingStates status;
 	
-	private int no_of_seats;
+	private Integer no_of_seats;
 	
 	private Long show_id;
 	
@@ -48,11 +56,11 @@ public class BookingRequest extends BaseRequest {
 		this.status = status;
 	}
 
-	public int getNo_of_seats() {
+	public Integer getNo_of_seats() {
 		return no_of_seats;
 	}
 
-	public void setNo_of_seats(int no_of_seats) {
+	public void setNo_of_seats(Integer no_of_seats) {
 		this.no_of_seats = no_of_seats;
 	}
 

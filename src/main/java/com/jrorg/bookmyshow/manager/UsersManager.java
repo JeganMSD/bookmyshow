@@ -19,8 +19,11 @@ import com.jrorg.bookmyshow.entity.Show;
 import com.jrorg.bookmyshow.entity.Ticket;
 import com.jrorg.bookmyshow.entity.User;
 import com.jrorg.bookmyshow.request.BaseRequest;
+import com.jrorg.bookmyshow.request.BookingRequest.BookingStates;
 import com.jrorg.bookmyshow.request.TicketBookingRequest;
 import com.jrorg.bookmyshow.request.UserRequest;
+import com.jrorg.bookmyshow.util.RestAPIException;
+import com.jrorg.bookmyshow.util.RestAPIException.Type;
 import com.jrorg.bookmyshow.util.ThreadDetails;
 import com.jrorg.bookmyshow.util.Utilities;
 
@@ -127,9 +130,18 @@ public class UsersManager<K extends User,V extends UserRequest>  implements Base
 	public Booking bookTickets(TicketBookingRequest request)throws Exception{
 		return PersistenceManager.perform(new Transaction<Booking>() {
 			@Override
-			public Booking perform(EntityManager entitymanager) {
+			public Booking perform(EntityManager entitymanager) throws Exception{
 				try {
 					request.setTicket_ids(request.getTicket_ids().subList(0, MAX_ALLOWED_BOOKINGS));
+					List<Ticket> tickets = entitymanager.createQuery("SELECT t FROM BMS_Tickets t WHERE t.id IN (:values) AND booking_id IN (SELECT b from BMS_Bookings b where b.status='0' and show_id='"+request.getShow_id()+"')",Ticket.class)
+					 .setParameter("values", request.getTicket_ids()).getResultList();
+					if(tickets!=null && tickets.size()<request.getTicket_ids().size()) {
+						entitymanager.createQuery("update BMS_Bookings set status = 2 where id = :booking_id").
+						setParameter("booking_id", tickets.get(0).getBooking().getId()).executeUpdate();
+					}
+					else {
+						throw new RestAPIException(Type.ALREADY_RESERVED);
+					}
 					Booking booking = new Booking();
 					booking.setNo_of_seats(request.getTicket_ids().size());
 					Show show = new Show();
@@ -137,20 +149,18 @@ public class UsersManager<K extends User,V extends UserRequest>  implements Base
 					booking.setShow(show);
 					booking.setUser(ThreadDetails.getCurrentUser());
 					booking.setBooked_time(System.currentTimeMillis());
-					booking.setStatus(0);
+					booking.setStatus(BookingStates.RESERVED);
 					entitymanager.persist(booking);
 					Long booking_id=booking.getId();
-					List<Ticket> tickets = entitymanager.createQuery("SELECT t FROM BMS_Tickets t WHERE t.id IN (:values) AND booking_id IN (SELECT b from BMS_Bookings b where b.status='0' and show_id='"+request.getShow_id()+"')",Ticket.class)
-					 .setParameter("values", request.getTicket_ids()).getResultList();
-					if(tickets!=null && tickets.size()<request.getTicket_ids().size()) {
-						entitymanager.createQuery("update BMS_Bookings set status = 2 where id = :booking_id").
-						setParameter("booking_id", tickets.get(0).getBooking().getId()).executeUpdate();
-					}
+					
 					entitymanager.createQuery("update BMS_Tickets  set booking_id = :booking_id where id IN (:values)")
 			            .setParameter("booking_id", booking_id)
 			            .setParameter("values", request.getTicket_ids())
 			            .executeUpdate();
 					return entitymanager.find(Booking.class, booking.getId());
+				}
+				catch(RestAPIException e) {
+					throw e;
 				}
 				catch(Exception e) {
 					Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "Error occured", e);

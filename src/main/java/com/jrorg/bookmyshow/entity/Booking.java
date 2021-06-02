@@ -22,6 +22,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import com.jrorg.bookmyshow.request.BaseRequest;
 import com.jrorg.bookmyshow.request.BookingRequest;
+import com.jrorg.bookmyshow.request.BookingRequest.BookingStates;
 
 @JsonInclude(Include.NON_NULL)
 @Entity(name ="BMS_Bookings")
@@ -69,12 +70,12 @@ public class Booking implements BaseEntity{
 		this.booked_time = booked_time;
 	}
 
-	public Integer getStatus() {
-		return status;
+	public BookingStates getStatus() {
+		return BookingStates.parse(this.status);
 	}
 
-	public void setStatus(Integer status) {
-		this.status = status;
+	public void setStatus(BookingStates status) {
+		this.status = status.key;
 	}
 
 	public Integer getNo_of_seats() {

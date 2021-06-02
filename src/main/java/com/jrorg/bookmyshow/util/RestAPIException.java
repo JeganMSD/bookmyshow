@@ -8,7 +8,8 @@ public class RestAPIException extends Exception{
 		MISSING_JSON_KEY("GE_104","Parameter $1 is missing"),
 		MISSING_JSON_KEY_WITH_VALUES("GE_105","Parameter $1 is missing.Possible values are $2"),
 		INVALID_RESOURCE_ID("GE_105","The resource Id for $1 is invalid"),
-		UNAUTHORISED("GE_100","Unauthorised request");
+		UNAUTHORISED("GE_100","Unauthorised request"), 
+		ALREADY_RESERVED("GE_106","Already reserved by some other user");
 		public final String code,message;
 		Type(String code,String message){
 			this.code =code;

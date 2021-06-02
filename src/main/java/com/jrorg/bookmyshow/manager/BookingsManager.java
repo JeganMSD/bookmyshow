@@ -15,6 +15,7 @@ import com.jrorg.bookmyshow.entity.Booking;
 import com.jrorg.bookmyshow.entity.Show;
 import com.jrorg.bookmyshow.request.BaseRequest;
 import com.jrorg.bookmyshow.request.BookingRequest;
+import com.jrorg.bookmyshow.request.BookingRequest.BookingStates;
 
 public class BookingsManager<K extends Booking,V extends BookingRequest> implements BaseManager<K, V>{
 
@@ -43,7 +44,7 @@ public class BookingsManager<K extends Booking,V extends BookingRequest> impleme
 					booking.setBooked_time(System.currentTimeMillis());
 				}
 				if(booking.getStatus()==null) {
-					booking.setStatus(0);
+					booking.setStatus(BookingStates.RESERVED);
 				}
 				entitymanager.persist(booking);
 				return (K)entitymanager.find(Booking.class, booking.getId());
